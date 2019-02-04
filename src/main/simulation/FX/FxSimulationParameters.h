@@ -140,6 +140,9 @@ public:
 	}
 
 	/* getter */
+	double getScaleFactor() {
+		return this->scale_factor;
+	}
 	int getMingen() {
 		return this->mingen;
 	}

@@ -20,18 +20,21 @@
 #include <News.h>
 #include <Agent.h>
 
-const int NUM_VARIABLES = 17;
+using namespace std;
+
+const int NUM_FX_VARIABLES = 17;
+const int NUM_FX_INTERNAL = 14;
 
 class FxAgent : public Agent {
 private:
 	FxMarket *fxmarket;
 	News *news;
-	int x[NUM_VARIABLES]; // characteristic value
-	int w[NUM_VARIABLES]; // importance of an agnet
+	int x[NUM_FX_VARIABLES]; // characteristic value
+	int w[NUM_FX_VARIABLES]; // importance of an agnet
 	std::list<Environment *> envs; // environments
 	double alpha; // scale factor
 	double exlogrtn; // expectation of logarithmic return
-	double var; // variance of logarithmic return
+	double tvar; // inverse of logarithmic return variance
 
 	double min_band_lweeks; // 先週の変動幅の最小単位
 	double min_band; // 変動の変動幅の最小単位
@@ -41,48 +44,65 @@ public:
 	FxAgent();
 	virtual ~FxAgent();
 
-	void next() {
-		this->see();
-		this->action();
-	}
+
 
 	/* get information from the environments. */
 	void see() {
 		vector<int> news_importance = this->news->getImportance();
-		int internal_var1 = this->fxmarket->getRate();
-		//vector<int> market_importance =
-//		cout << "2" << endl;
-//		cout << news_importance.size() << endl;
+		for ( int i = 0; i < NUM_FX_INTERNAL; i++ ) {
+			this->x[ i ] = news_importance[ i ];
+		}
+		// テクニカル系はまだ未対応
+		this->x[ NUM_FX_INTERNAL     ] = 0.0;
+		this->x[ NUM_FX_INTERNAL + 1 ] = 0.0;
+		this->x[ NUM_FX_INTERNAL + 2 ] = 0.0;
+	}
 
-
-//		for ( int i = 0; i < news_importance.size(); i++ ) {
-//			cout << news_importance[i] << endl;
-//		}
+	void state() {
+		this->predict();
+		cout << this->getName() << " exrtn:" << this->exlogrtn << " tvar:" << this->tvar << endl;
 	}
 
 	void action() {
+	}
+
+	void next() {
 	}
 
 	/* initialization of importances by random number */
 	void init_importances( int seed ) {
 		std::mt19937 rand_src(seed);
 		std::uniform_int_distribution<int> rand_dist(-3, 3); // w = [ -3, 3 ]
-		for ( int i = 0; i < NUM_VARIABLES; i++ ) {
+		for ( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			this->w[ i ] = rand_dist( rand_src );
 		}
 	}
 
 	void predict() {
-		this->exlogrtn = this->calcExLogRtn();
+		this->exlogrtn = this->calcExLogRtn();// 期待値の計算
+		this->tvar = this->calcVar(); // 分散の計算
 	}
 
 	double calcExLogRtn() {
 		double exlogrtn = 0.0;
-		for ( int i = 0; i < NUM_VARIABLES; i++ ) {
+		for ( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			exlogrtn += this->x[ i ] * this->w[ i ];
 		}
-		exlogrtn *= this->alpha;
 		return floor(exlogrtn) * this->alpha;
+	}
+
+	double calcVar() {
+		double wplus = 0.0;
+		double wminus = 0.0;
+		for (int i = 0; i < NUM_FX_VARIABLES; i++) {
+			double wx = this->w[ i ] * this->x[ i ];
+			if ( wx > 0 ) {
+				wplus += wx;
+			} else {
+				wminus -= wx;
+		    }
+		}
+		return sqrt( fabs( wplus * wplus - wminus * wminus ) );
 	}
 
 	/* setter */
@@ -92,21 +112,30 @@ public:
 	void setNews( News* news ) {
 		this->news = news;
 	}
+	void setAlpha( double alpha ) {
+		this->alpha = alpha;
+	}
 	void setInternalInfo(double trend1, double trend2, double trend3) {
 		this->min_band_lweeks = trend1; // 先週の変動幅の最小単位
 		this->min_band = trend2; // 変動の変動幅の最小単位
 		this->min_band_five_weeks = trend3; // 5週間の変動幅の最小単位
 	}
 
+	/* getter */
 	vector<int> getW() {
 		vector<int> w_int;
-		for( int i = 0; i < NUM_VARIABLES; i++ ) {
+		for( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			w_int.push_back( w[i] );
 
 		}
 		return w_int;
 	}
-
+	double getExLogRtn() {
+		return this->exlogrtn;
+	}
+	double getTVar() {
+		return this->tvar;
+	}
 };
 
 #endif /* SRC_AGENTS_FX_FXAGENT_H_ */

@@ -28,6 +28,9 @@ public:
 	virtual void see() {
 	}
 
+	virtual void state() {
+	}
+
 	virtual void next() {
 	}
 

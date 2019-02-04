@@ -88,14 +88,15 @@ int main(int argc, char *argv[]) {
 		string str(buf);
 		string name( "Agent-" + str );
 		age->setName( name );
+		age->setAlpha( param.getScaleFactor() );
 		age->setInternalInfo( param.getITrend1(), param.getITrend2(), param.getITrend3() );
 
 		/* initilize importances */
 		age->init_importances( i ); // first arugument is random seed.
 
 		/* list of environments that agent joins. */
-		age->env_in( &fxmarket );
-		age->env_in( &news );
+		age->setFxMarket( &fxmarket );
+		age->setNews( &news );
 		fxmarket.regist( age );
 		news.regist( age );
 	}
@@ -111,14 +112,12 @@ int main(int argc, char *argv[]) {
 	}
 
 	// 実行
+	tracelog::tag("Run");
 	for( int i = 5; i < date.size(); i++ ) {
 		cout << date[i] << endl;
-
 		world.see();
-
+		world.state();
 		exit(1);
-
-
 		world.next();
 	}
 

@@ -40,6 +40,14 @@ public:
 		}
 	}
 
+	void state() {
+		std::list<Object *>::iterator itr;
+		for (itr = objs.begin(); itr != objs.end(); itr++) {
+			Object *obj = *itr;
+			obj->state();
+		}
+	}
+
 	void next() {
 		std::list<Object *>::iterator itr;
 		for (itr = objs.begin(); itr != objs.end(); itr++) {

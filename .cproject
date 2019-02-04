@@ -22,21 +22,21 @@
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="cdt.managedbuild.targetPlatform.gnu.cross.335106202" isAbstract="false" osList="all" superClass="cdt.managedbuild.targetPlatform.gnu.cross"/>
 							<builder buildPath="${workspace_loc:/multiagent-systems-tmp}/Debug" enableAutoBuild="true" id="cdt.managedbuild.builder.gnu.cross.1124411760" keepEnvironmentInBuildfile="false" name="Gnu Make ビルダー" superClass="cdt.managedbuild.builder.gnu.cross"/>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.615975724" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler">
-								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.110662552" name="最適化レベル" superClass="gnu.c.compiler.option.optimization.level" value="gnu.c.optimization.level.most" valueType="enumerated"/>
-								<option defaultValue="gnu.c.debugging.level.max" id="gnu.c.compiler.option.debugging.level.2054234260" name="デバッグ・レベル" superClass="gnu.c.compiler.option.debugging.level" valueType="enumerated"/>
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.110662552" name="最適化レベル" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.most" valueType="enumerated"/>
+								<option defaultValue="gnu.c.debugging.level.max" id="gnu.c.compiler.option.debugging.level.2054234260" name="デバッグ・レベル" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1498292512" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.138601215" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
-								<option id="gnu.cpp.compiler.option.include.paths.988194010" name="インクルード・パス (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multiagent-systems-tmp/src/common}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multiagent-systems-tmp/src/world}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multiagent-systems-tmp/src/world/environment}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multiagent-systems-tmp/src/world/agent}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multiagent-systems-tmp/src/world/agent/fx}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/multiagent-systems-tmp/src/world/environment/fx}&quot;"/>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.988194010" name="インクルード・パス (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/common}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/agent/fx}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/environment}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/environment/fx}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/agent}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world}&quot;"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.optimization.level.1509160667" name="最適化レベル" superClass="gnu.cpp.compiler.option.optimization.level" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
-								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.option.debugging.level.2000713558" name="デバッグ・レベル" superClass="gnu.cpp.compiler.option.debugging.level" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.optimization.level.1509160667" name="最適化レベル" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.option.debugging.level.2000713558" name="デバッグ・レベル" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2098026647" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1627685715" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
