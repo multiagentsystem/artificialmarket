@@ -40,11 +40,11 @@ private:
 	double min_band; // 変動の変動幅の最小単位
 	double min_band_five_weeks; // 5週間の変動幅の最小単位
 
+	double fitness; // 実際の為替との適合度
+
 public:
 	FxAgent();
 	virtual ~FxAgent();
-
-
 
 	/* get information from the environments. */
 	void see() {
@@ -87,7 +87,9 @@ public:
 		double exlogrtn = 0.0;
 		for ( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			exlogrtn += this->x[ i ] * this->w[ i ];
+			//cout << this->x[i] << " " << this->w[i] << endl;
 		}
+		//cout << "exlogrtn: " << exlogrtn << endl;
 		return floor(exlogrtn) * this->alpha;
 	}
 
@@ -105,7 +107,14 @@ public:
 		return sqrt( fabs( wplus * wplus - wminus * wminus ) );
 	}
 
+	void calcFitness(double real, double pred) {
+		this->fitness -= fabs( real - pred );
+	}
+
 	/* setter */
+	void setFitness(double val) {
+		this->fitness = val;
+	}
 	void setFxMarket( FxMarket* fxmarket ) {
 		this->fxmarket = fxmarket;
 	}
@@ -135,6 +144,9 @@ public:
 	}
 	double getTVar() {
 		return this->tvar;
+	}
+	double getFitness() {
+		return this->fitness;
 	}
 };
 

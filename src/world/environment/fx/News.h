@@ -17,15 +17,20 @@
 #include <tracelog.h>
 #include <errorlog.h>
 
+using namespace std;
+
 class News : public Environment {
 private:
 	static const unsigned int NUM_IMPORTANCE;
-	std::ifstream ifs;
-	std::vector<int> importance;
+	ifstream ifs;
+	vector<int> date;
+	vector< vector<int> > importances;
+	int initial_id;
+	int id;
 	std::string fname;
 
 public:
-	News(const std::string fname) : fname(fname), ifs(fname) {
+	News(const string fname) : id(-1), initial_id(-1), fname(fname), ifs(fname) {
 		if ( this->ifs.fail() ) {
 			errorlog::error("Not found a news file");
 			throw "Exception : Not found a news file";
@@ -40,44 +45,51 @@ public:
 			errorlog::error("File is empty.");
 			throw "Exception : File is empty.";
 		}
-		this->readline();
+		while(true) {
+			if ( this->readline() == false ) break;
+		}
 	}
+
 	virtual ~News() {
 		if(this->ifs.is_open()) ifs.close();
 	}
 
-	void readline() {
+	bool readline() {
 		std::string str;
-		getline(this->ifs, str);
-		std::vector<std::string> strs = utility::split(str, '\t');
-		this->importance.clear();
-		for ( int i = 0; i < strs.size(); i++ ) {
-			this->importance.push_back( atoi( strs[ i ].c_str() ) );
+		if ( !getline(this->ifs, str) ) return false;
+		vector<string> strs = utility::split(str, '\t');
+		this->date.push_back( atoi( strs[0].c_str() ) );
+		vector<int> importance;
+		for ( int i = 1; i < strs.size(); i++ ) {
+			importance.push_back( atoi( strs[ i ].c_str() ) );
 		}
-		if ( this->importance.size() == 0 ) return;
-		if ( this->importance.size() != NUM_IMPORTANCE ) {
-			errorlog::error("invalid importance.");
-			throw "Exception : invalid importance.";
-		}
+		if ( importance.size() == 0 ) return false;
+		if ( importance.size() != NUM_IMPORTANCE ) return false;
+		this->importances.push_back( importance );
+		return true;
 	}
 
 	void restart() {
-		ifs.close();
-		this->ifs.open(this->fname);
-
-		if( !this->ifs.is_open() ) {
-			errorlog::error("File cannot open.");
-		}
-		if( this->ifs.eof() ) {
-			errorlog::error("File is empty.");
-			throw "Exception : File is empty.";
-		}
-		this->readline();
+		this->id = this->initial_id;
 	}
 
 	void next() {
-		if( this->ifs.eof() ) return;
-		this->readline();
+		this->id++;
+		if ( this->importances.size() > this->id + 1 ) {
+			this->id++;
+		} else {
+			this->id = -1;
+		}
+	}
+
+	void setID(int yyyymmdd) {
+		this->id = -1;
+		for ( int i = 0; i < this->date.size(); i++ ) {
+			if ( this->date[ i ] == yyyymmdd ) {
+				this->initial_id = i;
+				this->id = i;
+			}
+		}
 	}
 
 	bool isEof() {
@@ -86,8 +98,14 @@ public:
 	}
 
 	/* getter */
-	std::vector<int> getImportance() {
-		return this->importance;
+	vector< vector<int> >& getImportances() {
+		return this->importances;
+	}
+	vector<int>& getImportance() {
+		return this->importances[this->id];
+	}
+	vector<int>& getImportance(int id) {
+		return this->importances[id];
 	}
 };
 

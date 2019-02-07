@@ -32,15 +32,17 @@ private:
 	double min_band; // 4
 	double min_band_five_weeks; // 5
 	int num_agents; // 6
-	int mingen; // 7
-	int maxgen; // 8
-	int train_term_length; // 9
-	double prob_cross; // 10
-	double prob_mutation; // 11
-	double prob_gap; // 12
-	int sim_iter; // 13
-	int train_iter; // 14
-	string output_type; // 15
+	int train_start_date; // 7
+	int train_end_date; // 8
+	int predict_start_date; // 9
+	int predict_end_date; // 10
+	int train_term_length; // 11
+	double prob_cross; // 12
+	double prob_mutation; // 13
+	double prob_gap; // 14
+	int sim_iter; // 15
+	int train_iter; // 16
+	string output_type; // 17
 
 public:
 	FxSimulationParameters();
@@ -50,7 +52,7 @@ public:
 		string fxInputPath = utility::getCurrentDir() + "/" + "src/main/simulation/FX/input";
 
 		/* news file path */
-		this->newsFilePath = fxInputPath + "/" + "data.dat";
+		this->newsFilePath = fxInputPath + "/" + "internal_importance.dat";
 
 		/* parameter file path */
 		this->paraFilePath = fxInputPath + "/" + "para.txt";
@@ -69,6 +71,18 @@ public:
 		oss.str("");
 		oss << this->num_agents;
 		tracelog::keyvalue( " num agents", oss.str().c_str() );
+		oss.str("");
+		oss << this->train_start_date;
+		tracelog::keyvalue( " train start date", oss.str().c_str());
+		oss.str("");
+		oss << this->train_end_date;
+		tracelog::keyvalue( " train end date", oss.str().c_str());
+		oss.str("");
+		oss << this->predict_start_date;
+		tracelog::keyvalue( " predicit start date", oss.str().c_str());
+		oss.str("");
+		oss << this->predict_end_date;
+		tracelog::keyvalue(" predict end date", oss.str().c_str());
 	}
 
 	bool readFile() {
@@ -89,52 +103,72 @@ public:
 		if( ifs.eof() ) return false;
 
 		std::string str;
+		std::vector<string> strs;
 
 		/* 1 */
 		getline( ifs, str );
-		this->scale_factor = atof( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->scale_factor = atof( strs[0].c_str() );
 		/* 2 */
 		getline( ifs, str );
-		this->predict_step = atoi( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->predict_step = atoi( strs[0].c_str() );
 		/* 3 */
 		getline( ifs, str );
-		this->min_band_lweeks = atof( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->min_band_lweeks = atof( strs[0].c_str() );
 		/* 4 */
 		getline( ifs, str );
-		this->min_band = atof( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->min_band = atof( strs[0].c_str() );
 		/* 5 */
 		getline( ifs, str );
-		this->min_band_five_weeks = atof( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->min_band_five_weeks = atof( strs[0].c_str() );
 		/* 6 */
 		getline( ifs, str );
-		this->num_agents = atoi( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->num_agents = atoi( strs[0].c_str() );
 		/* 7 */
 		getline( ifs, str );
-		this->mingen = atoi( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->train_start_date = atoi( strs[0].c_str() );
 		/* 8 */
 		getline( ifs, str );
-		this->maxgen = atoi ( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->train_end_date = atoi ( strs[0].c_str() );
 		/* 9 */
 		getline( ifs, str );
-		this->train_term_length = atoi ( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->predict_start_date = atoi ( strs[0].c_str() );
 		/* 10 */
 		getline( ifs, str );
-		this->prob_cross = atof ( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->predict_end_date = atoi ( strs[0].c_str() );
+		/* 10 */
+		getline( ifs, str );
+		strs = utility::split(str, '\t');
+		this->prob_cross = atof ( strs[0].c_str() );
 		/* 11 */
 		getline( ifs, str );
-		this->prob_mutation = atof ( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->prob_mutation = atof ( strs[0].c_str() );
 		/* 12 */
 		getline( ifs, str );
-		this->prob_gap = atof( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->prob_gap = atof( strs[0].c_str() );
 		/* 13 */
 		getline( ifs, str );
-		this->sim_iter = atoi( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->sim_iter = atoi( strs[0].c_str() );
 		/* 14 */
 		getline( ifs, str );
-		this->train_iter = atoi( str.c_str() );
+		strs = utility::split(str, '\t');
+		this->train_iter = atoi( strs[0].c_str() );
 		/* 15 */
 		getline( ifs, str );
-		this->output_type = str;
+		strs = utility::split(str, '\t');
+		this->output_type = strs[0];
 
 		return true;
 	}
@@ -143,11 +177,17 @@ public:
 	double getScaleFactor() {
 		return this->scale_factor;
 	}
-	int getMingen() {
-		return this->mingen;
+	int getTrainStartDate() {
+		return this->train_start_date;
 	}
-	int getMaxgen() {
-		return this->maxgen;
+	int getTrainEndDate() {
+		return this->train_end_date;
+	}
+	int getPredictStartDate() {
+		return this->predict_start_date;
+	}
+	int getPredictEndDate() {
+		return this->predict_end_date;
 	}
 	double getITrend1() {
 		return this->min_band_lweeks;

@@ -31,11 +31,12 @@ int main(int argc, char *argv[]) {
 	param.info();
 
 	/* read fx.dat */
-	RealFx realfx( param.getFxFilePath(), 0, param.getMaxgen() );
-	vector<int> date = realfx.getDate();
+	RealFx realfx( param.getFxFilePath() );
+
+	vector<int> date = realfx.getDateList();
 	vector<double> rtn = realfx.getRtn();
-	int start = param.getTrainLength();
-	int end = param.getMaxgen();
+	int start = param.getTrainStartDate();
+	int end = param.getPredictEndDate();
 	double ave = utility::getAverage( start, end, date, rtn);
 	double std = utility::getStd( start, end, date, rtn);
 	tracelog::keyvalue("average", to_string(ave));
@@ -51,23 +52,6 @@ int main(int argc, char *argv[]) {
 	/* create News */
 	News news( param.getNewsFilePath() );
 	news.setName("News");
-
-	/* output news data + date */
-	ofstream outputfile("importance.txt");
-	int cnt_date = 5;
-	while( !news.isEof() ) {
-		vector<int> imp = news.getImportance();
-		outputfile << date[ cnt_date ] << "\t";
-		for ( int i = 0; i < imp.size(); i++ ) {
-			outputfile << imp[i] << "\t";
-		}
-		outputfile << endl;
-
-		cnt_date++;
-		if ( cnt_date >= date.size() ) break;
-		news.next();
-	}
-	news.restart();
 
 	/* registration to world */
 	world.regist( &fxmarket );
@@ -111,13 +95,53 @@ int main(int argc, char *argv[]) {
 		cout << endl;
 	}
 
+	int train_start_date_id = realfx.getID( param.getTrainStartDate() );
+	int train_end_date_id = realfx.getID( param.getTrainEndDate() );
+	int predict_start_date_id = realfx.getID( param.getPredictStartDate() );
+	int predict_end_date_id = realfx.getID( param.getPredictEndDate() );
+
+	cout << train_start_date_id << " " << date[train_start_date_id] << endl;
+	cout << train_end_date_id << " " << date[train_end_date_id] << endl;
+	cout << train_end_date_id - train_start_date_id + 1 << endl;
+
+	cout << predict_start_date_id << " " << date[predict_start_date_id] << endl;
+	cout << predict_end_date_id << " " << date[predict_end_date_id] << endl;
+	cout << predict_end_date_id - predict_start_date_id + 1 << endl;
+
+	// 全エージェントに対して訓練期間を用いた遺伝的アルゴリズムによる重要度の初期値計算
+	int current_date = param.getTrainStartDate();
+	news.setID( current_date );
+	for( int i = 0; i < ages.size(); i++ ) {
+		ages[ i ].setFitness(0.0);
+	}
+
+	// 最終時刻までなので、i < T としていることに注意 ( i=T だと1期間超えてしまう )
+	for ( int i = train_start_date_id; i < train_end_date_id; i++ ) {
+		int yyyymmdd = date[ i ];
+		double realLogRate0 = realfx.getLn(i);
+		double realLogRate1 = realfx.getLn(i+1);
+		//cout << realLogRate0 << " " << realLogRate1 << endl;
+		double realDiffLogRate = realLogRate1 - realLogRate0;
+		for( int i = 0; i < ages.size(); i++ ) {
+			ages[i].see();
+			double predDiffLogRate = ages[ i ].calcExLogRtn();
+			//cout << "pred: " << predDiffLogRate << endl;
+			ages[ i ].calcFitness(realDiffLogRate, predDiffLogRate);
+		}
+		news.next();
+	}
+	for( int i = 0; i < ages.size(); i++ ) {
+		cout << "agent-" << i << " " << ages[ i ].getFitness() << endl;
+	}
+
+	exit(1);
+
 	// 実行
 	tracelog::tag("Run");
-	for( int i = 5; i < date.size(); i++ ) {
-		cout << date[i] << endl;
+	for( int i = 5; i 	< date.size(); i++ ) {
+		cout << date[i] << "¥n";
 		world.see();
 		world.state();
-		exit(1);
 		world.next();
 	}
 

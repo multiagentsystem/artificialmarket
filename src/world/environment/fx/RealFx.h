@@ -32,7 +32,7 @@ class RealFx {
 
 public:
 	RealFx();
-	RealFx(const string& fname, int start, int end ) : start(), end(), frequency() {
+	RealFx(const string& fname, int start=0, int end=99999999 ) : start(), end(), frequency() {
 
 		tracelog::tag("FxData");
 
@@ -96,15 +96,12 @@ public:
 		} else {
 			this->start = data_start;
 		}
-		if ( end > 0 ) {
-			if ( data_end < end ) {
-				errorlog::error("data to specified end does not exist in " + fname);
-				errorlog::abort();
-			}
-			this->end = end;
-		} else {
-			this->end = data_end;
+		if ( end < data_end ) {
+			errorlog::error("data to specified end does not exist in " + fname);
+			errorlog::error("end date: " + to_string(end));
+			errorlog::abort();
 		}
+		this->end = data_end;
 
 		int cnt = 0;
 		while( true ) {
@@ -161,7 +158,7 @@ public:
 
 
 	/* getter */
-	vector<int>& getDate() {
+	vector<int>& getDateList() {
 		return this->date;
 	}
 	vector<double>& getRtn() {
