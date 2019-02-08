@@ -31,4 +31,5 @@ src/world/agent/fx \
 src/world/environment \
 src/world/environment/fx \
 src/world/environment/historicalmarket \
+src/world/learning/generic \
 

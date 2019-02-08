@@ -8,6 +8,7 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
+-include src/world/learning/generic/subdir.mk
 -include src/world/environment/historicalmarket/subdir.mk
 -include src/world/environment/fx/subdir.mk
 -include src/world/environment/subdir.mk
@@ -61,5 +62,6 @@ clean:
 	-@echo ' '
 
 .PHONY: all clean dependents
+.SECONDARY:
 
 -include ../makefile.targets
