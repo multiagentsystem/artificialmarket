@@ -27,7 +27,7 @@ private:
 
 	/* para.txt */
 	double scale_factor; // 1
-	int predict_step; // 2
+	int predict_max_width; // 2
 	double min_band_lweeks; // 3
 	double min_band; // 4
 	double min_band_five_weeks; // 5
@@ -112,7 +112,7 @@ public:
 		/* 2 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
-		this->predict_step = atoi( strs[0].c_str() );
+		this->predict_max_width = atoi( strs[0].c_str() );
 		/* 3 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
@@ -176,6 +176,9 @@ public:
 	/* getter */
 	double getScaleFactor() {
 		return this->scale_factor;
+	}
+	int predictMaxWidth() {
+		return this->predict_max_width;
 	}
 	int getTrainStartDate() {
 		return this->train_start_date;

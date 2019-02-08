@@ -22,21 +22,21 @@ using namespace std;
 int main(int argc, char *argv[]) {
 
 	/* Parameter Read */
-	FxSimulationParameters param;
-	param.init();
-	if ( !param.readFile() ) {
+	FxSimulationParameters params;
+	params.init();
+	if ( !params.readFile() ) {
 		errorlog::error("File read failed.");
 		return -1;
 	}
-	param.info();
+	params.info();
 
 	/* read fx.dat */
-	RealFx realfx( param.getFxFilePath() );
+	RealFx realfx( params.getFxFilePath() );
 
 	vector<int> date = realfx.getDateList();
 	vector<double> rtn = realfx.getRtn();
-	int start = param.getTrainStartDate();
-	int end = param.getPredictEndDate();
+	int start = params.getTrainStartDate();
+	int end = params.getPredictEndDate();
 	double ave = utility::getAverage( start, end, date, rtn);
 	double std = utility::getStd( start, end, date, rtn);
 	tracelog::keyvalue("average", to_string(ave));
@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 	fxmarket.setName("FxMarket");
 
 	/* create News */
-	News news( param.getNewsFilePath() );
+	News news( params.getNewsFilePath() );
 	news.setName("News");
 
 	/* registration to world */
@@ -59,8 +59,8 @@ int main(int argc, char *argv[]) {
 
 	/* create agents */
 	tracelog::tag("Registration Agent");
-	vector<FxAgent> ages( param.getNumAgents() );
-	for ( int i = 0; i < param.getNumAgents(); i++ ) {
+	vector<FxAgent> ages( params.getNumAgents() );
+	for ( int i = 0; i < params.getNumAgents(); i++ ) {
 		FxAgent *age = &ages[ i ];
 
 		// regist to the world
@@ -72,8 +72,7 @@ int main(int argc, char *argv[]) {
 		string str(buf);
 		string name( "Agent-" + str );
 		age->setName( name );
-		age->setAlpha( param.getScaleFactor() );
-		age->setInternalInfo( param.getITrend1(), param.getITrend2(), param.getITrend3() );
+		age->setFxSimulationParameters( &params );
 
 		/* initilize importances */
 		age->init_importances( i ); // first arugument is random seed.
@@ -95,10 +94,10 @@ int main(int argc, char *argv[]) {
 		cout << endl;
 	}
 
-	int train_start_date_id = realfx.getID( param.getTrainStartDate() );
-	int train_end_date_id = realfx.getID( param.getTrainEndDate() );
-	int predict_start_date_id = realfx.getID( param.getPredictStartDate() );
-	int predict_end_date_id = realfx.getID( param.getPredictEndDate() );
+	int train_start_date_id = realfx.getID( params.getTrainStartDate() );
+	int train_end_date_id = realfx.getID( params.getTrainEndDate() );
+	int predict_start_date_id = realfx.getID( params.getPredictStartDate() );
+	int predict_end_date_id = realfx.getID( params.getPredictEndDate() );
 
 	cout << train_start_date_id << " " << date[train_start_date_id] << endl;
 	cout << train_end_date_id << " " << date[train_end_date_id] << endl;
@@ -109,7 +108,7 @@ int main(int argc, char *argv[]) {
 	cout << predict_end_date_id - predict_start_date_id + 1 << endl;
 
 	// 全エージェントに対して訓練期間を用いた遺伝的アルゴリズムによる重要度の初期値計算
-	int current_date = param.getTrainStartDate();
+	int current_date = params.getTrainStartDate();
 	news.setID( current_date );
 	for( int i = 0; i < ages.size(); i++ ) {
 		ages[ i ].setFitness(0.0);

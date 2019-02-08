@@ -85,18 +85,18 @@ public:
 		return std;
 	}
 
-	static int roundIzumi( double x ) {
+	static int roundIzumi( double x, double max ) {
 		int a = 1;
 		if (x < 0) {
 		    a = -1;
 		}
-		if ( fabs( x ) < 3 ) {
+		if ( fabs( x ) < max ) {
 		    return ((int)fabs(x) * a);
 		} else {
-			if (x >= 3) {
-				return 3;
+			if (x >= max) {
+				return max;
 			} else {
-		      return -3;
+		      return -max;
 			}
 		}
 		return 0;
