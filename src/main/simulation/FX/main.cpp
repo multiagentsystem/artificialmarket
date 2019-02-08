@@ -114,7 +114,6 @@ int main(int argc, char *argv[]) {
 	for( int i = 0; i < ages.size(); i++ ) {
 		ages[ i ].setFitness(0.0);
 	}
-
 	// 最終時刻までなので、i < T としていることに注意 ( i=T だと1期間超えてしまう )
 	for ( int i = train_start_date_id; i < train_end_date_id; i++ ) {
 		int yyyymmdd = date[ i ];

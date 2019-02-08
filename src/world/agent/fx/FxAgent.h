@@ -19,6 +19,7 @@
 #include <FxMarket.h>
 #include <News.h>
 #include <Agent.h>
+#include <FxSimulationParameters.h>
 
 using namespace std;
 
@@ -29,13 +30,12 @@ class FxAgent : public Agent {
 private:
 	FxMarket *fxmarket;
 	News *news;
+	FxSimulationParameters *params;
 	int x[NUM_FX_VARIABLES]; // characteristic value
 	int w[NUM_FX_VARIABLES]; // importance of an agnet
-	std::list<Environment *> envs; // environments
 	double alpha; // scale factor
 	double exlogrtn; // expectation of logarithmic return
 	double tvar; // inverse of logarithmic return variance
-
 	double min_band_lweeks; // 先週の変動幅の最小単位
 	double min_band; // 変動の変動幅の最小単位
 	double min_band_five_weeks; // 5週間の変動幅の最小単位
@@ -120,6 +120,9 @@ public:
 	}
 	void setNews( News* news ) {
 		this->news = news;
+	}
+	void setFxSimulationParameters(FxSimulationParameters* params) {
+		this->params = params;
 	}
 	void setAlpha( double alpha ) {
 		this->alpha = alpha;

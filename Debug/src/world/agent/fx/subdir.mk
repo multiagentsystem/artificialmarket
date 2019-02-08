@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/world/agent/fx/FxAgent.cpp 
+../src/world/agent/fx/FxAgent.cpp \
+../src/world/agent/fx/FxSimulationParameters.cpp 
 
 OBJS += \
-./src/world/agent/fx/FxAgent.o 
+./src/world/agent/fx/FxAgent.o \
+./src/world/agent/fx/FxSimulationParameters.o 
 
 CPP_DEPS += \
-./src/world/agent/fx/FxAgent.d 
+./src/world/agent/fx/FxAgent.d \
+./src/world/agent/fx/FxSimulationParameters.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

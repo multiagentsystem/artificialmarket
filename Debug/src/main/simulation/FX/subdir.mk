@@ -4,15 +4,12 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/main/simulation/FX/FxSimulationParameters.cpp \
 ../src/main/simulation/FX/main.cpp 
 
 OBJS += \
-./src/main/simulation/FX/FxSimulationParameters.o \
 ./src/main/simulation/FX/main.o 
 
 CPP_DEPS += \
-./src/main/simulation/FX/FxSimulationParameters.d \
 ./src/main/simulation/FX/main.d 
 
 
