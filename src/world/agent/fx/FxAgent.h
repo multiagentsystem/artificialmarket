@@ -20,6 +20,7 @@
 #include <News.h>
 #include <Agent.h>
 #include <FxSimulationParameters.h>
+#include <errorlog.h>
 
 using namespace std;
 
@@ -120,13 +121,24 @@ public:
 	void setFxSimulationParameters(FxSimulationParameters* params) {
 		this->params = params;
 	}
+	void setImportance(int idx, int w) {
+		if ( idx >= NUM_FX_VARIABLES ) {
+			errorlog::error("Array index out of bound.");
+		}
+		this->w[ idx ] = w;
+	}
 
 	/* getter */
+	int getW(int idx) {
+		if ( idx >= NUM_FX_VARIABLES ) {
+			errorlog::error("Array index out of bound.");
+		}
+		return this->w[ idx ];
+	}
 	vector<int> getW() {
 		vector<int> w_int;
 		for( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
-			w_int.push_back( w[i] );
-
+			w_int.push_back( w[ i ] );
 		}
 		return w_int;
 	}

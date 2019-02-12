@@ -14,6 +14,7 @@
 #include <errorlog.h>
 
 class Generic {
+	int cnt;
 	vector<FxAgent *> agents;
 	double pmutation; // 突然変異を起こす確率
 	double pcross; // 交叉確率
@@ -27,20 +28,31 @@ class Generic {
 	int pcross_start;
 	int pcross_end;
 
-	// 乱数
-	int gen_seed; // 乱数シード
-	std::mt19937 mt_gen;
-	int flip_seed;
+	// エージェントシャッフル
+	int seed_shuffle; // 乱数シード
+	std::mt19937 mt_shuffle;
+
+	// 変更するかどうかの判定
+	int seed_flip;
 	std::mt19937 mt_flip;
+
+	// 突然変異
+	int seed_mut; // 乱数シード
+	std::mt19937 mt_mut;
 
 	int num_mutations; // 突然変異をした数
 
-	std::uniform_int_distribution<> rand_imp;
+	std::uniform_int_distribution<int> rand_imp;
+	std::uniform_real_distribution<double> rand_prob;
 
 public:
 	Generic();
-	Generic(vector<FxAgent *> agents, double pmutation, double pcross, double gap, int gen_seed = 0, int flip_seed = 1) :
-		agents(agents), pmutation(pmutation), pcross(pcross), gap(gap), gen_seed(gen_seed), flip_seed(flip_seed), mt_gen(gen_seed), mt_flip(flip_seed), rand_imp(-4,4) {
+	Generic(vector<FxAgent *> agents, double pmutation, double pcross, double gap, int seed_shuffle = 0, int seed_flip = 1, int seed_mut = 2 ) :
+		agents(agents), pmutation(pmutation), pcross(pcross), gap(gap),
+		seed_shuffle(seed_shuffle), seed_flip(seed_flip), seed_mut(seed_mut),
+		mt_shuffle(seed_shuffle), mt_flip(seed_flip), mt_mut(seed_mut),
+		rand_imp(-4,4), rand_prob(0.0,1.0), cnt(0) {
+
 		if ( this->pmutation >= 0.0 && this->pmutation <= 1.0 ) {
 		} else {
 			errorlog::error("pmutation is invalid value");
@@ -81,34 +93,54 @@ public:
 		this->shuffle();
 		// 突然変異
 		this->mutation();
+		cout << "num mutations: " << this->num_mutations << endl;
+		this->cnt++;
 	}
 
 	void shuffle() {
 		this->id = this->make_rand_array_unique( this->agents.size(), 0, this->agents.size() - 1);
-		for ( int i = 0; i < this->id.size(); i++ ) {
-			cout << i << " " << this->id[i] << endl;
-		}
 	}
 
 	void mutation() {
 		int num_mutations = 0;
 		for ( int i = this->pmutation_start; i <= this->pmutation_end; i++ ) {
+			int select_id = this->id[ i ];
+			FxAgent *pagent = this->agents[ select_id ];
+			// 重要度のループ(17)
 			for ( int j = 0; j < FxAgent::getNumVariables(); j++ ) {
-				cout << j << " ";
-				if( flip() ) {
+				if( this->flip( this->pmutation ) ) {
+					int imp = this->random_imp();
+					// 値が同じだったらもう一度
+					if ( imp == pagent->getW( j ) ) {
+						j--;
+						continue;
+					}
+					pagent->setImportance(j, imp);
 					num_mutations++;
 				}
 			}
-			cout << endl;
+		}
+		this->num_mutations = num_mutations;
+	}
+
+	void cross() {
+		for ( int i = this->pcross_start; i <= this->pcross_end; i+=2 ) {
+			int select_id
 		}
 	}
 
-	bool flip(vector<double> imp, int i) {
-		if ( true ) {
-			double imp = this->rand_imp( this->mt_flip );
+	bool flip( double prob ) {
+		if ( prob == 1.0 ) return true;
+		/* rand_prob は[0.0, 1.0)の範囲 */
+		double p = this->rand_prob( this->mt_flip);
+		if ( p <= prob ) {
 			return true;
 		}
 		return false;
+	}
+
+	double random_imp() {
+		return this->decode( this->rand_imp( this->mt_flip ) );
 	}
 
 	double decode(int x) {
@@ -159,7 +191,7 @@ public:
 	    if(max_min_diff < size) throw std::runtime_error("引数が異常です");
 
 	    std::vector<int> tmp;
-	    auto engine = this->mt_gen;
+	    auto engine = this->mt_shuffle;
 	    std::uniform_int_distribution<int> distribution(rand_min, rand_max);
 
 	    const size_t make_size = static_cast<size_t>(size*1.2);
