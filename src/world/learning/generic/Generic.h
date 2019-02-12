@@ -125,7 +125,7 @@ public:
 
 	void cross() {
 		for ( int i = this->pcross_start; i <= this->pcross_end; i+=2 ) {
-			int select_id
+			int select_id =
 		}
 	}
 
