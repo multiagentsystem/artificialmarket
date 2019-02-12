@@ -11,7 +11,8 @@ src/main/simulation/FX/main.o: ../src/main/simulation/FX/main.cpp \
   /Users/naritomi/git/artificialmarket/src/world/agent/Agent.h \
   /Users/naritomi/git/artificialmarket/src/world/environment/fx/News.h \
   /Users/naritomi/git/artificialmarket/src/world/agent/fx/FxAgent.h \
-  /Users/naritomi/git/artificialmarket/src/world/agent/fx/FxSimulationParameters.h
+  /Users/naritomi/git/artificialmarket/src/world/agent/fx/FxSimulationParameters.h \
+  /Users/naritomi/git/artificialmarket/src/world/learning/generic/Generic.h
 
 /Users/naritomi/git/artificialmarket/src/world/World.h:
 
@@ -38,3 +39,5 @@ src/main/simulation/FX/main.o: ../src/main/simulation/FX/main.cpp \
 /Users/naritomi/git/artificialmarket/src/world/agent/fx/FxAgent.h:
 
 /Users/naritomi/git/artificialmarket/src/world/agent/fx/FxSimulationParameters.h:
+
+/Users/naritomi/git/artificialmarket/src/world/learning/generic/Generic.h:

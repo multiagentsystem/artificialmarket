@@ -12,6 +12,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
+#include <algorithm>
 #include <math.h>
 
 using namespace std;
@@ -100,6 +102,46 @@ public:
 			}
 		}
 		return 0;
+	}
+
+	static std::mt19937 create_rand_engine(){
+	    std::random_device rnd;
+	    std::vector<std::uint_least32_t> v(10);// 初期化用ベクタ
+	    std::generate(v.begin(), v.end(), std::ref(rnd));// ベクタの初期化
+	    std::seed_seq seed(v.begin(), v.end());
+	    return std::mt19937(seed);// 乱数エンジン
+	}
+
+	static std::mt19937 create_rand_engine(int seed) {
+		std::mt19937 Get_random;
+		Get_random.seed(seed);
+		return Get_random;
+	}
+
+	static std::vector<int> make_rand_array_unique(int seed, const size_t size, int rand_min, int rand_max){
+	    if(rand_min > rand_max) std::swap(rand_min, rand_max);
+	    const size_t max_min_diff = static_cast<size_t>(rand_max - rand_min + 1);
+	    if(max_min_diff < size) throw std::runtime_error("引数が異常です");
+
+	    std::vector<int> tmp;
+	    auto engine = create_rand_engine(seed);
+	    std::uniform_int_distribution<int> distribution(rand_min, rand_max);
+
+	    const size_t make_size = static_cast<size_t>(size*1.2);
+
+	    while(tmp.size() < size){
+	        while(tmp.size() < make_size) tmp.push_back(distribution(engine));
+	        std::sort(tmp.begin(), tmp.end());
+	        auto unique_end = std::unique(tmp.begin(), tmp.end());
+
+	        if(size < std::distance(tmp.begin(), unique_end)){
+	            unique_end = std::next(tmp.begin(), size);
+	        }
+	        tmp.erase(unique_end, tmp.end());
+	    }
+
+	    std::shuffle(tmp.begin(), tmp.end(), engine);
+	    return std::move(tmp);
 	}
 };
 

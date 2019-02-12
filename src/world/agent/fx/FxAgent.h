@@ -139,6 +139,10 @@ public:
 	double getFitness() {
 		return this->fitness;
 	}
+
+	static int getNumVariables() {
+		return NUM_FX_VARIABLES;
+	}
 };
 
 #endif /* SRC_AGENTS_FX_FXAGENT_H_ */

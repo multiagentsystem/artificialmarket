@@ -13,6 +13,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <math.h>
 #include <utility.h>
 
 using namespace std;
@@ -37,12 +38,15 @@ private:
 	int predict_start_date; // 9
 	int predict_end_date; // 10
 	int train_term_length; // 11
-	double prob_cross; // 12
-	double prob_mutation; // 13
-	double prob_gap; // 14
-	int sim_iter; // 15
-	int train_iter; // 16
-	string output_type; // 17
+	double train_pcross; // 12
+	double train_pmutation; // 13
+	double train_gap; // 14
+	double predict_pcross; // 15
+	double predict_pmutation; // 16
+	double predict_gap; // 17
+	int sim_iter; // 18
+	int train_iter; // 19
+	string output_type; // 20
 
 public:
 	FxSimulationParameters();
@@ -145,27 +149,39 @@ public:
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
 		this->predict_end_date = atoi ( strs[0].c_str() );
-		/* 10 */
-		getline( ifs, str );
-		strs = utility::split(str, '\t');
-		this->prob_cross = atof ( strs[0].c_str() );
 		/* 11 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
-		this->prob_mutation = atof ( strs[0].c_str() );
+		this->train_pcross = atof ( strs[0].c_str() );
 		/* 12 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
-		this->prob_gap = atof( strs[0].c_str() );
+		this->train_pmutation = atof ( strs[0].c_str() );
 		/* 13 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
-		this->sim_iter = atoi( strs[0].c_str() );
+		this->train_gap = atof( strs[0].c_str() );
 		/* 14 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
-		this->train_iter = atoi( strs[0].c_str() );
+		this->predict_pcross = atof ( strs[0].c_str() );
 		/* 15 */
+		getline( ifs, str );
+		strs = utility::split(str, '\t');
+		this->predict_pmutation = atof ( strs[0].c_str() );
+		/* 16 */
+		getline( ifs, str );
+		strs = utility::split(str, '\t');
+		this->predict_gap = atof( strs[0].c_str() );
+		/* 17 */
+		getline( ifs, str );
+		strs = utility::split(str, '\t');
+		this->sim_iter = atoi( strs[0].c_str() );
+		/* 18 */
+		getline( ifs, str );
+		strs = utility::split(str, '\t');
+		this->train_iter = atoi( strs[0].c_str() );
+		/* 19 */
 		getline( ifs, str );
 		strs = utility::split(str, '\t');
 		this->output_type = strs[0];
@@ -212,6 +228,24 @@ public:
 	}
 	int getNumAgents() {
 		return this->num_agents;
+	}
+	double getTrainPcross() {
+		return this->train_pcross;
+	}
+	double getTrainPmutation() {
+		return this->train_pmutation;
+	}
+	double getTrainGap() {
+		return this->train_gap;
+	}
+	double getPredictPcross() {
+		return this->predict_pcross;
+	}
+	double getPredictPmutation() {
+		return this->train_pmutation;
+	}
+	double getPredictGap() {
+		return this->train_gap;
 	}
 };
 

@@ -34,6 +34,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/environment/fx}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/agent}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/artificialmarket/src/world/learning/generic}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1509160667" name="最適化レベル" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
 								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.option.debugging.level.2000713558" name="デバッグ・レベル" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>

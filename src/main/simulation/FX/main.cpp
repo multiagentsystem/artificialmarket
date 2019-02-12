@@ -14,6 +14,7 @@
 #include <FxAgent.h>
 #include <tracelog.h>
 #include <errorlog.h>
+#include <Generic.h>
 #include <utility.h>
 #include "FxSimulationParameters.h"
 
@@ -61,7 +62,7 @@ int main(int argc, char *argv[]) {
 	tracelog::tag("Registration Agent");
 	vector<FxAgent> ages( params.getNumAgents() );
 	for ( int i = 0; i < params.getNumAgents(); i++ ) {
-		FxAgent *age = &ages[ i ];
+		FxAgent *age = &ages[i];
 
 		// regist to the world
 		world.regist( age );
@@ -128,9 +129,15 @@ int main(int argc, char *argv[]) {
 		}
 		news.next();
 	}
+	vector<FxAgent *> pages;
 	for( int i = 0; i < ages.size(); i++ ) {
 		cout << "agent-" << i << " " << ages[ i ].getFitness() << endl;
+		pages.push_back( &ages[i] );
 	}
+
+	Generic generic( pages, params.getTrainPmutation(), params.getTrainPcross(), params.getTrainGap());
+	generic.info();
+	generic.learning();
 
 	exit(1);
 
