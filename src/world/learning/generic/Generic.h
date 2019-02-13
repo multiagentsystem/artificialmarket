@@ -40,18 +40,26 @@ class Generic {
 	int seed_mut; // 乱数シード
 	std::mt19937 mt_mut;
 
+	// ルーレット選択
+	int seed_roulette;
+	std::mt19937 mt_roulette;
+
 	int num_mutations; // 突然変異をした数
 
 	std::uniform_int_distribution<int> rand_imp;
 	std::uniform_real_distribution<double> rand_prob;
 
+	double total_fitness;
+	double min_fitness;
+
 public:
 	Generic();
-	Generic(vector<FxAgent *> agents, double pmutation, double pcross, double gap, int seed_shuffle = 0, int seed_flip = 1, int seed_mut = 2 ) :
+	Generic(vector<FxAgent *> agents, double pmutation, double pcross, double gap, int seed_shuffle = 0, int seed_flip = 1, int seed_mut = 2, int seed_roulette = 3 ) :
 		agents(agents), pmutation(pmutation), pcross(pcross), gap(gap),
-		seed_shuffle(seed_shuffle), seed_flip(seed_flip), seed_mut(seed_mut),
-		mt_shuffle(seed_shuffle), mt_flip(seed_flip), mt_mut(seed_mut),
-		rand_imp(-4,4), rand_prob(0.0,1.0), cnt(0) {
+		seed_shuffle(seed_shuffle), seed_flip(seed_flip), seed_mut(seed_mut), seed_roulette(seed_roulette),
+		mt_shuffle(seed_shuffle), mt_flip(seed_flip), mt_mut(seed_mut), mt_roulette(seed_roulette),
+		rand_imp(-4,4), rand_prob(0.0,1.0), cnt(0), total_fitness(0.0), min_fitness(0.0),
+		num_mutations(0) {
 
 		if ( this->pmutation >= 0.0 && this->pmutation <= 1.0 ) {
 		} else {
@@ -67,7 +75,7 @@ public:
 		}
 		this->pcross_start = 0;
 		this->pcross_end = (int)( this->gap * this->agents.size() ) - 1;
-		this->pmutation_start = this->pcross_end;
+		this->pmutation_start = this->pcross_end + 1;
 		this->pmutation_end = this->agents.size() - 1;
 		if ( this->pmutation_start > this->pmutation_end ) {
 			this->pmutation_start = this->pmutation_end;
@@ -91,8 +99,13 @@ public:
 	void learning() {
 		// エージェントをシャッフル
 		this->shuffle();
+
+		// 適合度の総和及び最小値の計算
+		this->calcFitness();
+
 		// 突然変異
 		this->mutation();
+		this->crossover();
 		cout << "num mutations: " << this->num_mutations << endl;
 		this->cnt++;
 	}
@@ -123,9 +136,10 @@ public:
 		this->num_mutations = num_mutations;
 	}
 
-	void cross() {
+	void crossover() {
+		// 確率分布の定義
+
 		for ( int i = this->pcross_start; i <= this->pcross_end; i+=2 ) {
-			int select_id =
 		}
 	}
 
@@ -209,6 +223,42 @@ public:
 
 	    std::shuffle(tmp.begin(), tmp.end(), engine);
 	    return std::move(tmp);
+	}
+
+	void calcFitness() {
+		double sum = 0.0;
+		double min = 0.0;
+		for( int i = this->pcross_start; i <= this->pcross_end; i++) {
+			double fitness = this->agents[ i ]->getFitness();
+			sum += fitness;
+			if ( fitness < min ) {
+				min = fitness;
+			}
+		}
+		int num_agents = this->pcross_end - this->pcross_start + 1;
+
+		cout << "num: " << num_agents << endl;
+
+		/* 0.1の加算の意味は最小のものもルーレット選択できる余地を残すため */
+		/* また min を原点として適合度を見るため */
+		sum += num_agents * ( 0.1 - min );
+		this->min_fitness = min;
+		this->total_fitness = sum;
+	}
+
+	int roulette_select() {
+		std::uniform_int_distribution<int> rand_agent(0, this->pcross_end - this->pcross_start + 1);
+		double rand = rand_agent( this->mt_roulette ) * this->total_fitness;
+		double sum = 0.0;
+		int idx = 0;
+		for( int i = this->pcross_start; i <= this->pcross_end; i++) {
+			sum += this->agents[ i ]->getFitness() - this->min_fitness + 0.1;
+			if ( rand < sum ) {
+				idx = i;
+				break;
+			}
+		}
+		return 0;
 	}
 
 	/* setter */
