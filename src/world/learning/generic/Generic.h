@@ -136,10 +136,31 @@ public:
 		this->num_mutations = num_mutations;
 	}
 
-	void crossover() {
-		// 確率分布の定義
+	/* 自然淘汰 */
+	void natural_selection() {
+		int start = this->pcross_start;
+		int end = this->pcross_end;
+		if ( end - start + 1 <= 1 ) return;
+		for ( int i = start; i <= end; i++ ) {
+			int mate1 = this->id[ i ];
+			int mate2 = this->roulette_select();
+			if ( mate1 != mate2 ) {
 
-		for ( int i = this->pcross_start; i <= this->pcross_end; i+=2 ) {
+			}
+		}
+	}
+
+	void crossover() {
+		int start = this->pcross_start;
+		int end = this->pcross_end;
+		if ( end - start + 1 <= 1 ) return;
+		for ( int i = start; i <= end; i++ ) {
+			int mate1 = this->roulette_select();
+			//cout << mate1 << " " << mate2 << endl;
+			if ( mate1 == mate2 ) {
+				i-=2;
+				continue;
+			}
 		}
 	}
 
@@ -247,10 +268,11 @@ public:
 	}
 
 	int roulette_select() {
-		std::uniform_int_distribution<int> rand_agent(0, this->pcross_end - this->pcross_start + 1);
-		double rand = rand_agent( this->mt_roulette ) * this->total_fitness;
+		std::uniform_real_distribution<double> rand_agent(0, this->total_fitness);
+		// [0,max]の範囲でランダムに選択
+		double rand = rand_agent( this->mt_roulette );
 		double sum = 0.0;
-		int idx = 0;
+		int idx = -1;
 		for( int i = this->pcross_start; i <= this->pcross_end; i++) {
 			sum += this->agents[ i ]->getFitness() - this->min_fitness + 0.1;
 			if ( rand < sum ) {
@@ -258,7 +280,11 @@ public:
 				break;
 			}
 		}
-		return 0;
+		if ( idx < 0 ) {
+			errorlog::error("invalid value");
+			errorlog::abort();
+		}
+		return idx;
 	}
 
 	/* setter */
