@@ -16,6 +16,9 @@
 class Generic {
 	int cnt;
 	vector<FxAgent *> agents;
+
+	vector< vector<int> > chromosome; // 遺伝子
+
 	double pmutation; // 突然変異を起こす確率
 	double pcross; // 交叉確率
 	double gap; // 世代間ギャップ
@@ -144,8 +147,15 @@ public:
 		for ( int i = start; i <= end; i++ ) {
 			int mate1 = this->id[ i ];
 			int mate2 = this->roulette_select();
-			if ( mate1 != mate2 ) {
-
+			if ( mate1 == mate2 ) continue;
+			double fitness1 = this->agents[ mate1 ]->getFitness();
+			double fitness2 = this->agents[ mate2 ]->getFitness();
+			// 適合度の大小から
+			if ( fitness1 > fitness2 ) {
+				this->agents[ mate2 ]->setImportance( this->agents[ mate1 ]->getW() );
+			} else if ( fitness1 < fitness2 ) {
+				this->agents[ mate1 ]->setImportance( this->agents[ mate2 ]->getW() );
+			} else if ( fitness1 == fitness2 ) {
 			}
 		}
 	}
@@ -156,11 +166,6 @@ public:
 		if ( end - start + 1 <= 1 ) return;
 		for ( int i = start; i <= end; i++ ) {
 			int mate1 = this->roulette_select();
-			//cout << mate1 << " " << mate2 << endl;
-			if ( mate1 == mate2 ) {
-				i-=2;
-				continue;
-			}
 		}
 	}
 
@@ -267,6 +272,7 @@ public:
 		this->total_fitness = sum;
 	}
 
+	// ルーレット選択
 	int roulette_select() {
 		std::uniform_real_distribution<double> rand_agent(0, this->total_fitness);
 		// [0,max]の範囲でランダムに選択

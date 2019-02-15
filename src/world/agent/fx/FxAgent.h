@@ -39,6 +39,8 @@ private:
 
 	double fitness; // 実際の為替との適合度
 
+
+
 public:
 	FxAgent();
 	virtual ~FxAgent();
@@ -121,6 +123,11 @@ public:
 	void setFxSimulationParameters(FxSimulationParameters* params) {
 		this->params = params;
 	}
+	void setImportance(vector<int>& w) {
+		for( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
+			this->w[ i ] = w[ i ];
+		}
+	}
 	void setImportance(int idx, int w) {
 		if ( idx >= NUM_FX_VARIABLES ) {
 			errorlog::error("Array index out of bound.");
@@ -135,7 +142,7 @@ public:
 		}
 		return this->w[ idx ];
 	}
-	vector<int> getW() {
+	vector<int>& getW() {
 		vector<int> w_int;
 		for( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			w_int.push_back( w[ i ] );
