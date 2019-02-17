@@ -247,6 +247,9 @@ public:
 	double getPredictGap() {
 		return this->train_gap;
 	}
+	int getTrainIter() {
+		return this->train_iter;
+	}
 };
 
 #endif /* FXSIMULATIONPARAMETERS_H_ */

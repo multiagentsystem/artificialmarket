@@ -17,13 +17,16 @@ class Generic {
 	int cnt;
 	vector<FxAgent *> agents;
 
-	vector< vector<int> > chromosome; // 遺伝子
+	vector< vector<int> > chromosome_after; // 変更後の遺伝子
+	vector< vector<int> > chromosome_before; // 変更前の遺伝子
 
 	double pmutation; // 突然変異を起こす確率
 	double pcross; // 交叉確率
 	double gap; // 世代間ギャップ
 
-	vector<int> id;
+	// 自然淘汰及び交叉を行う遺伝子ペア
+	vector<int> id1;
+	vector<int> id2;
 
 	// 突然変異を受けるエージェントのインデックス
 	int pmutation_start;
@@ -100,27 +103,107 @@ public:
 	}
 
 	void learning() {
-		// エージェントをシャッフル
-		this->shuffle();
+
+		// 初期化
+		this->learning_init();
+
+		// 自然淘汰
+		this->natural_selection();
+
+		// 交叉
+		this->crossover();
+
+		// 突然変異
+		this->mutation();
+
+		// 更新
+		this->update();
+
+		cout << "cost: " << this->total_fitness << endl;
+
+		this->cnt++;
+	}
+
+	void learning_init() {
+		// コピー
+		this->chromosome_after.clear();
+		this->chromosome_before.clear();
+		for( int i = 0; i < this->agents.size(); i++ ) {
+			FxAgent* age = this->agents[ i ];
+			vector<int> w = age->getW();
+			this->chromosome_after.push_back( w );
+			this->chromosome_before.push_back( w );
+		}
 
 		// 適合度の総和及び最小値の計算
 		this->calcFitness();
 
-		// 突然変異
-		this->mutation();
-		this->crossover();
-		cout << "num mutations: " << this->num_mutations << endl;
-		this->cnt++;
+		// エージェントをシャッフル
+		this->shuffle();
 	}
 
+	// シャッフル関数
 	void shuffle() {
-		this->id = this->make_rand_array_unique( this->agents.size(), 0, this->agents.size() - 1);
+		this->id1 = this->make_rand_array_unique( this->agents.size(), 0, this->agents.size() - 1);
+		this->id2.clear();
+		for ( int i = 0; i < 100; i++ ) {
+			int id = this->roulette_select();
+			if ( this->id1[ i % 10 ] == id ) {
+				i--;
+				continue;
+			}
+			this->id2.push_back( id );
+		}
+//		for ( int i = 0; i < this->id1.size(); i++ ) {
+//			cout << this->id1[i] << " " << this->id2[i] << endl;
+//		}
 	}
 
+	/* 自然淘汰 */
+	void natural_selection() {
+		int start = this->pcross_start;
+		int end = this->pcross_end;
+		if ( end - start + 1 <= 1 ) return;
+		for ( int i = start; i <= end; i++ ) {
+			int mate1 = this->id1[ i ];
+			int mate2 = this->id2[ i ];
+			if ( mate1 == mate2 ) continue;
+			double fitness1 = this->agents[ mate1 ]->getFitness();
+			double fitness2 = this->agents[ mate2 ]->getFitness();
+			// 適合度が小さければ自然淘汰を受ける
+			if ( fitness2 > fitness1 ) {
+				this->chromosome_after[ mate1 ] = this->chromosome_before[ mate2 ];
+			}
+		}
+	}
+
+	// 交叉
+	void crossover() {
+		std::uniform_int_distribution<int> rand_cross(1, FxAgent::getNumVariables()-2);
+		int start = this->pcross_start;
+		int end = this->pcross_end;
+		if ( end - start + 1 <= 1 ) return;
+		for ( int i = start; i <= end; i++ ) {
+			if ( flip( this->pcross ) ) {
+				// 交叉位置
+				int cross_pos = rand_cross(this->mt_flip);
+				int mate1 = this->id1[ i ];
+				int mate2 = this->id2[ i ];
+				for ( int j = cross_pos; j < FxAgent::getNumVariables(); j++ ) {
+					this->chromosome_after[mate1][j] = this->chromosome_before[mate2][j];
+				}
+				for ( int j = 0; j < cross_pos; j++ ) {
+					this->chromosome_after[mate2][j] = this->chromosome_before[mate1][j];
+				}
+			}
+		}
+	}
+
+	// 突然変異
 	void mutation() {
 		int num_mutations = 0;
-		for ( int i = this->pmutation_start; i <= this->pmutation_end; i++ ) {
-			int select_id = this->id[ i ];
+		for ( int i = 0; i <= this->agents.size(); i++ ) {
+			int select_id = this->id1[ i ];
 			FxAgent *pagent = this->agents[ select_id ];
 			// 重要度のループ(17)
 			for ( int j = 0; j < FxAgent::getNumVariables(); j++ ) {
@@ -131,7 +214,7 @@ public:
 						j--;
 						continue;
 					}
-					pagent->setImportance(j, imp);
+					this->chromosome_after[ select_id ][ j ] = imp;
 					num_mutations++;
 				}
 			}
@@ -139,34 +222,22 @@ public:
 		this->num_mutations = num_mutations;
 	}
 
-	/* 自然淘汰 */
-	void natural_selection() {
-		int start = this->pcross_start;
-		int end = this->pcross_end;
-		if ( end - start + 1 <= 1 ) return;
-		for ( int i = start; i <= end; i++ ) {
-			int mate1 = this->id[ i ];
-			int mate2 = this->roulette_select();
-			if ( mate1 == mate2 ) continue;
-			double fitness1 = this->agents[ mate1 ]->getFitness();
-			double fitness2 = this->agents[ mate2 ]->getFitness();
-			// 適合度の大小から
-			if ( fitness1 > fitness2 ) {
-				this->agents[ mate2 ]->setImportance( this->agents[ mate1 ]->getW() );
-			} else if ( fitness1 < fitness2 ) {
-				this->agents[ mate1 ]->setImportance( this->agents[ mate2 ]->getW() );
-			} else if ( fitness1 == fitness2 ) {
+	// 更新
+	void update() {
+		for ( int i = 0; i < this->chromosome_after.size(); i++ ) {
+			vector<int> w_after = this->chromosome_after[i];
+			vector<int> w_before = this->chromosome_before[i];
+			this->agents[i]->setImportance(w_after);
+			for ( int j = 0; j < w_before.size(); j++  ) {
+				cout << w_before[j] << " " ;
 			}
+			cout << " -> ";
+			for ( int j = 0; j < w_after.size(); j++  ) {
+				cout << w_after[j] << " ";
+			}
+			cout << endl;
 		}
-	}
 
-	void crossover() {
-		int start = this->pcross_start;
-		int end = this->pcross_end;
-		if ( end - start + 1 <= 1 ) return;
-		for ( int i = start; i <= end; i++ ) {
-			int mate1 = this->roulette_select();
-		}
 	}
 
 	bool flip( double prob ) {
@@ -281,6 +352,7 @@ public:
 		int idx = -1;
 		for( int i = this->pcross_start; i <= this->pcross_end; i++) {
 			sum += this->agents[ i ]->getFitness() - this->min_fitness + 0.1;
+			//cout << "sum : " << sum << " " << rand <<  endl;
 			if ( rand < sum ) {
 				idx = i;
 				break;

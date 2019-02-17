@@ -123,7 +123,7 @@ public:
 	void setFxSimulationParameters(FxSimulationParameters* params) {
 		this->params = params;
 	}
-	void setImportance(vector<int>& w) {
+	void setImportance(vector<int> w) {
 		for( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			this->w[ i ] = w[ i ];
 		}
@@ -142,7 +142,7 @@ public:
 		}
 		return this->w[ idx ];
 	}
-	vector<int>& getW() {
+	vector<int> getW() {
 		vector<int> w_int;
 		for( int i = 0; i < NUM_FX_VARIABLES; i++ ) {
 			w_int.push_back( w[ i ] );

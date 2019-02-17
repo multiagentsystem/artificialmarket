@@ -108,36 +108,41 @@ int main(int argc, char *argv[]) {
 	cout << predict_end_date_id << " " << date[predict_end_date_id] << endl;
 	cout << predict_end_date_id - predict_start_date_id + 1 << endl;
 
-	// 全エージェントに対して訓練期間を用いた遺伝的アルゴリズムによる重要度の初期値計算
-	int current_date = params.getTrainStartDate();
-	news.setID( current_date );
-	for( int i = 0; i < ages.size(); i++ ) {
-		ages[ i ].setFitness(0.0);
-	}
-	// 最終時刻までなので、i < T としていることに注意 ( i=T だと1期間超えてしまう )
-	for ( int i = train_start_date_id; i < train_end_date_id; i++ ) {
-		int yyyymmdd = date[ i ];
-		double realLogRate0 = realfx.getLn(i);
-		double realLogRate1 = realfx.getLn(i+1);
-		//cout << realLogRate0 << " " << realLogRate1 << endl;
-		double realDiffLogRate = realLogRate1 - realLogRate0;
-		for( int i = 0; i < ages.size(); i++ ) {
-			ages[i].see();
-			double predDiffLogRate = ages[ i ].calcExLogRtn();
-			//cout << "pred: " << predDiffLogRate << endl;
-			ages[ i ].calcFitness(realDiffLogRate, predDiffLogRate);
-		}
-		news.next();
-	}
 	vector<FxAgent *> pages;
 	for( int i = 0; i < ages.size(); i++ ) {
-		cout << "agent-" << i << " " << ages[ i ].getFitness() << endl;
+		//cout << "agent-" << i << " " << ages[ i ].getFitness() << endl;
 		pages.push_back( &ages[i] );
 	}
 
 	Generic generic( pages, params.getTrainPmutation(), params.getTrainPcross(), params.getTrainGap());
 	generic.info();
-	generic.learning();
+	for ( int i = 0; i < params.getTrainIter(); i++ ) {
+		// 全エージェントに対して訓練期間を用いた遺伝的アルゴリズムによる重要度の初期値計算
+		int current_date = params.getTrainStartDate();
+		news.setID( current_date );
+		for( int i = 0; i < ages.size(); i++ ) {
+			ages[ i ].setFitness(0.0);
+		}
+		// 最終時刻までなので、i < T としていることに注意 ( i=T だと1期間超えてしまう )
+		for ( int i = train_start_date_id; i < train_end_date_id; i++ ) {
+			int yyyymmdd = date[ i ];
+			double realLogRate0 = realfx.getLn(i);
+			double realLogRate1 = realfx.getLn(i+1);
+			//cout << realLogRate0 << " " << realLogRate1 << endl;
+			double realDiffLogRate = realLogRate1 - realLogRate0;
+			for( int i = 0; i < ages.size(); i++ ) {
+				ages[i].see();
+				double predDiffLogRate = ages[ i ].calcExLogRtn();
+				//cout << "pred: " << predDiffLogRate << endl;
+				ages[ i ].calcFitness(realDiffLogRate, predDiffLogRate);
+			}
+			news.next();
+		}
+		cout << "iter: " << i << endl;
+		cout << "Enter learning" << endl;
+		generic.learning();
+		cout << "End learning" << endl;
+	}
 
 	exit(1);
 
