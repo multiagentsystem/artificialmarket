@@ -3,8 +3,11 @@
  *
  *  Created on: 2019/01/18
  *      Author: yusuke
- */
+*/
 
+#include <iostream>
+#include <iomanip>
+#include <limits>
 #include <vector>
 #include <string>
 #include <list>
@@ -114,6 +117,10 @@ int main(int argc, char *argv[]) {
 		pages.push_back( &ages[i] );
 	}
 
+	// ファイル出力(GA)
+	std::ofstream writing_file;
+	writing_file.open("ga_result.dat", std::ios::out);
+
 	Generic generic( pages, params.getTrainPmutation(), params.getTrainPcross(), params.getTrainGap());
 	generic.info();
 	for ( int i = 0; i < params.getTrainIter(); i++ ) {
@@ -138,10 +145,12 @@ int main(int argc, char *argv[]) {
 			}
 			news.next();
 		}
-		cout << "iter: " << i << endl;
-		cout << "Enter learning" << endl;
+		//cout << "Enter learning" << endl;
 		generic.learning();
-		cout << "End learning" << endl;
+		//cout << "End learning" << endl;
+
+		cout << setprecision(6) << i << " " << generic.getFitness() / ages.size() << endl;
+		writing_file << setprecision(6) << i << " " << generic.getFitness() / ages.size() << endl;
 	}
 
 	exit(1);

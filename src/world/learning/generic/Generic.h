@@ -105,21 +105,26 @@ public:
 	void learning() {
 
 		// 初期化
+		//cout << "1" << endl;
 		this->learning_init();
 
 		// 自然淘汰
+		//cout << "2" << endl;
 		this->natural_selection();
 
 		// 交叉
+		//cout << "3" << endl;
 		this->crossover();
 
 		// 突然変異
+		//cout << "4" << endl;
 		this->mutation();
 
 		// 更新
+		//cout << "5" << endl;
 		this->update();
 
-		cout << "cost: " << this->total_fitness << endl;
+		//cout << "total fitness: " << this->total_fitness << endl;
 
 		this->cnt++;
 	}
@@ -146,9 +151,9 @@ public:
 	void shuffle() {
 		this->id1 = this->make_rand_array_unique( this->agents.size(), 0, this->agents.size() - 1);
 		this->id2.clear();
-		for ( int i = 0; i < 100; i++ ) {
+		for ( int i = 0; i < this->agents.size(); i++ ) {
 			int id = this->roulette_select();
-			if ( this->id1[ i % 10 ] == id ) {
+			if ( this->id1[ i ] == id ) {
 				i--;
 				continue;
 			}
@@ -167,6 +172,7 @@ public:
 		for ( int i = start; i <= end; i++ ) {
 			int mate1 = this->id1[ i ];
 			int mate2 = this->id2[ i ];
+			//cout << "sele: " << i << " " << mate1 << " " << mate2 << endl;
 			if ( mate1 == mate2 ) continue;
 			double fitness1 = this->agents[ mate1 ]->getFitness();
 			double fitness2 = this->agents[ mate2 ]->getFitness();
@@ -228,14 +234,14 @@ public:
 			vector<int> w_after = this->chromosome_after[i];
 			vector<int> w_before = this->chromosome_before[i];
 			this->agents[i]->setImportance(w_after);
-			for ( int j = 0; j < w_before.size(); j++  ) {
-				cout << w_before[j] << " " ;
-			}
-			cout << " -> ";
-			for ( int j = 0; j < w_after.size(); j++  ) {
-				cout << w_after[j] << " ";
-			}
-			cout << endl;
+//			for ( int j = 0; j < w_before.size(); j++  ) {
+//				cout << w_before[j] << " " ;
+//			}
+//			cout << " -> ";
+//			for ( int j = 0; j < w_after.size(); j++  ) {
+//				cout << w_after[j] << " ";
+//			}
+//			cout << endl;
 		}
 
 	}
@@ -334,7 +340,7 @@ public:
 		}
 		int num_agents = this->pcross_end - this->pcross_start + 1;
 
-		cout << "num: " << num_agents << endl;
+		//cout << "num: " << num_agents << endl;
 
 		/* 0.1の加算の意味は最小のものもルーレット選択できる余地を残すため */
 		/* また min を原点として適合度を見るため */
@@ -368,6 +374,11 @@ public:
 	/* setter */
 	void addAgent(FxAgent *agent) {
 		this->agents.push_back(agent);
+	}
+
+	/* getter */
+	double getFitness() {
+		return this->total_fitness;
 	}
 };
 
